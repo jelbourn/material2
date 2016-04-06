@@ -1,5 +1,8 @@
 # Material Design for Angular 2
 
+
+THIS IS A MERGE BUTTON TEST
+
 [![Build Status](https://travis-ci.org/angular/material2.svg?branch=master)](https://travis-ci.org/angular/material2)
 [![Gitter](https://badges.gitter.im/angular/material2.svg)](https://gitter.im/angular/material2?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge)
 
