@@ -6,7 +6,7 @@ const github = new GitHubApi();
 
 github.search.issues({
   per_page: 100,
-  q: 'repo:angular/material2 is:pr is:merged merged:>2018-01-22 -label:"release: minor"',
+  q: 'repo:angular/material2 is:pr is:merged merged:>2018-02-19 -label:"release: minor" -label:"release: major"',
 }, (error, response) => {
   if (response) {
 
