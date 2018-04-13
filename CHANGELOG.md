@@ -1,3 +1,13 @@
+<a name="6.0.0-rc.6"></a>
+# [6.0.0-rc.6](https://github.com/angular/material2/compare/6.0.0-rc.5...6.0.0-rc.6) (2018-04-13)
+
+
+### Bug Fixes
+
+* **schematics:** correct path to ng-update entry-point ([#10850](https://github.com/angular/material2/issues/10850)) ([6a82c65](https://github.com/angular/material2/commit/6a82c65))
+
+
+
 <a name="6.0.0-rc.5"></a>
 # [6.0.0-rc.5](https://github.com/angular/material2/compare/6.0.0-rc.4...6.0.0-rc.5) (2018-04-13)
 
