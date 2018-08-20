@@ -11,7 +11,9 @@ ts_library(
   name = "cdk",
   srcs = glob(["*.ts"], exclude=["**/*.spec.ts"]),
   module_name = "@angular/cdk",
-  deps = [],
+  deps = [
+    "@angular//packages/core",
+  ],
   tsconfig = "//src/lib:tsconfig-build.json",
 )
 

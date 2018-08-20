@@ -86,16 +86,11 @@ ts_setup_workspace()
 check_rules_typescript_version("0.16.0")
 
 # Add Angular rules (e.g. ng_module).
-# http_archive(
-#   name = "angular",
-#   url = "https://github.com/angular/angular/archive/6.1.2.zip",
-#   strip_prefix = "angular-6.1.2",
-#   sha256 = "e7553542cebd1113069a92d97a464a2d2aa412242926686653b8cf0101935617",
-# )
-
-local_repository(
+http_archive(
   name = "angular",
-  path = "/tmp/angular-6.1.2",
+  url = "https://github.com/angular/angular/archive/116946fb11794f2986ba9b88baf8920a62e6f982.zip",
+  strip_prefix = "angular-116946fb11794f2986ba9b88baf8920a62e6f982",
+  sha256 = "86b606fd2d8c79e67fb6cba57ba2341e645c1cffa473494d5d00a2de4c7e784e",
 )
 
 
