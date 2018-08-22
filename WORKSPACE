@@ -48,11 +48,16 @@ http_archive(
 ###############################################################################
 
 # Add nodejs rules
-http_archive(
+# http_archive(
+#   name = "build_bazel_rules_nodejs",
+#   urls = ["https://github.com/bazelbuild/rules_nodejs/archive/0.11.5.zip"],
+#   strip_prefix = "rules_nodejs-0.11.5",
+#   sha256 = "985bf908faa72cc4638c356a99d19ccac223e5dcd8dae695e3157e5c00f53489"
+# )
+
+local_repository(
   name = "build_bazel_rules_nodejs",
-  urls = ["https://github.com/bazelbuild/rules_nodejs/archive/0.11.3.zip"],
-  strip_prefix = "rules_nodejs-0.11.3",
-  sha256 = "e8842fa5f5e38f2c826167ff94323d4b5aabd13217cee867d971d6f860cfd730"
+  path = "/tmp/rules_nodejs-0.11.5",
 )
 
 # NOTE: this rule installs nodejs, npm, and yarn, but does NOT install
@@ -86,17 +91,17 @@ ts_setup_workspace()
 check_rules_typescript_version("0.16.0")
 
 # Add Angular rules (e.g. ng_module).
-http_archive(
-  name = "angular",
-  url = "https://github.com/angular/angular/archive/116946fb11794f2986ba9b88baf8920a62e6f982.zip",
-  strip_prefix = "angular-116946fb11794f2986ba9b88baf8920a62e6f982",
-  sha256 = "86b606fd2d8c79e67fb6cba57ba2341e645c1cffa473494d5d00a2de4c7e784e",
-)
-
-# local_repository(
+# http_archive(
 #   name = "angular",
-#   path = "/tmp/angular-7.0.0-beta.2",
+#   url = "https://github.com/angular/angular/archive/116946fb11794f2986ba9b88baf8920a62e6f982.zip",
+#   strip_prefix = "angular-116946fb11794f2986ba9b88baf8920a62e6f982",
+#   sha256 = "86b606fd2d8c79e67fb6cba57ba2341e645c1cffa473494d5d00a2de4c7e784e",
 # )
+
+local_repository(
+  name = "angular",
+  path = "/tmp/angular-4e36f0cd68dfc5e0b9f53f6555cbc49a38efdcf7",
+)
 
 
 load("@angular//:index.bzl", "ng_setup_workspace")
