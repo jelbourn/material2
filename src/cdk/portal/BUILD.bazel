@@ -7,7 +7,11 @@ ng_module(
   name = "portal",
   srcs = glob(["**/*.ts"], exclude=["**/*.spec.ts"]),
   module_name = "@angular/cdk/portal",
-  deps = ["@rxjs"],
+  deps = [
+    "@rxjs",
+    "@angular//packages/core",
+    "@angular//packages/common",
+  ],
   tsconfig = "//src/cdk:tsconfig-build.json",
 )
 

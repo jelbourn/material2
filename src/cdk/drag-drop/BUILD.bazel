@@ -11,6 +11,8 @@ ng_module(
   assets = [":drop.css"],
   deps = [
     "@rxjs",
+    "@angular//packages/core",
+    "@angular//packages/common",
     "//src/cdk/platform",
     "//src/cdk/overlay",
     "//src/cdk/bidi",

@@ -93,6 +93,11 @@ http_archive(
   sha256 = "86b606fd2d8c79e67fb6cba57ba2341e645c1cffa473494d5d00a2de4c7e784e",
 )
 
+# local_repository(
+#   name = "angular",
+#   path = "/tmp/angular-7.0.0-beta.2",
+# )
+
 
 load("@angular//:index.bzl", "ng_setup_workspace")
 ng_setup_workspace()

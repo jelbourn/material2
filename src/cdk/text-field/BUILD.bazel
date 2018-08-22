@@ -8,6 +8,7 @@ ng_module(
   module_name = "@angular/cdk/text-field",
   deps = [
     "@rxjs",
+    "@angular//packages/core",
     "//src/cdk/coercion",
     "//src/cdk/platform",
   ],

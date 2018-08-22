@@ -10,7 +10,7 @@ ng_module(
   module_name = "@angular/cdk/coercion",
   deps = [
     "@rxjs",
-    # "@angular//packages/core",
+    "@angular//packages/core",
   ],
   tsconfig = "//src/cdk:tsconfig-build.json",
 )

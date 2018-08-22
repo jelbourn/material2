@@ -11,6 +11,7 @@ ng_module(
     "//src/cdk/coercion",
     "//src/cdk/platform",
     "@rxjs",
+    "@angular//packages/core",
   ],
   tsconfig = "//src/cdk:tsconfig-build.json",
 )

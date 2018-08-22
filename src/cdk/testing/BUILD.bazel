@@ -6,5 +6,8 @@ ng_module(
   srcs = glob(["**/*.ts"], exclude=["**/*.spec.ts"]),
   module_name = "@angular/cdk/testing",
   tsconfig = ":tsconfig-test.json",
-  deps = ["@rxjs"],
+  deps = [
+    "@rxjs",
+    "@angular//packages/core",
+  ],
 )

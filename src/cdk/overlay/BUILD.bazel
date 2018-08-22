@@ -15,6 +15,8 @@ ng_module(
     "//src/cdk/portal",
     "//src/cdk/scrolling",
     "@rxjs",
+    "@angular//packages/core",
+    "@angular//packages/common",
   ],
   tsconfig = "//src/cdk:tsconfig-build.json",
 )
