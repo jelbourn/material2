@@ -48,16 +48,11 @@ http_archive(
 ###############################################################################
 
 # Add nodejs rules
-# http_archive(
-#   name = "build_bazel_rules_nodejs",
-#   urls = ["https://github.com/bazelbuild/rules_nodejs/archive/0.11.5.zip"],
-#   strip_prefix = "rules_nodejs-0.11.5",
-#   sha256 = "985bf908faa72cc4638c356a99d19ccac223e5dcd8dae695e3157e5c00f53489"
-# )
-
-local_repository(
+http_archive(
   name = "build_bazel_rules_nodejs",
-  path = "/tmp/rules_nodejs-0.11.5",
+  urls = ["https://github.com/bazelbuild/rules_nodejs/archive/0.11.5.zip"],
+  strip_prefix = "rules_nodejs-0.11.5",
+  sha256 = "985bf908faa72cc4638c356a99d19ccac223e5dcd8dae695e3157e5c00f53489"
 )
 
 # NOTE: this rule installs nodejs, npm, and yarn, but does NOT install
