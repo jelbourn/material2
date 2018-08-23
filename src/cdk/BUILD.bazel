@@ -24,6 +24,6 @@ ng_package(
   entry_point = "src/cdk/public_api.js",
   globals = ROLLUP_GLOBALS,
   replacements = VERSION_PLACEHOLDER_REPLACEMENTS,
-  deps = CDK_TARGETS,
+  deps = CDK_TARGETS + ["@angular//packages/core", "@angular//packages/common"],
   tags = ["publish"],
 )
