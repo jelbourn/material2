@@ -25,5 +25,6 @@ ng_package(
   globals = ROLLUP_GLOBALS,
   replacements = VERSION_PLACEHOLDER_REPLACEMENTS,
   deps = CDK_TARGETS + ["@angular//packages/core", "@angular//packages/common"],
-  tags = ["publish"],
+  # TODO(jelbourn): re-enable once @Injectable w/ providedIn works on Bazel
+  tags = ["publish", "manual"],
 )
