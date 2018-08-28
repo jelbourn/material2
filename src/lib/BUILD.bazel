@@ -50,5 +50,6 @@ ng_package(
   packages = ["//src/lib/schematics:npm_package"],
   replacements = VERSION_PLACEHOLDER_REPLACEMENTS,
   deps = MATERIAL_TARGETS,
-  tags = ["publish"],
+  # TODO(jelbourn): re-enable this when ngInjectableDef works with Bazel.
+  tags = ["publish", "manual"],
 )

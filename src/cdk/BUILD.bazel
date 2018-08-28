@@ -23,5 +23,6 @@ ng_package(
   globals = ROLLUP_GLOBALS,
   replacements = VERSION_PLACEHOLDER_REPLACEMENTS,
   deps = CDK_TARGETS,
-  tags = ["publish"],
+  # TODO(jelbourn): re-enable this when ngInjectableDef works with Bazel.
+  tags = ["publish", "manual"],
 )
