@@ -74,7 +74,7 @@ import {
 /** The debounce interval when typing letters to select an option. */
 const LETTER_KEY_DEBOUNCE_INTERVAL = 200;
 
-describe('MatSelect', () => {
+fdescribe('MatSelect', () => {
   let overlayContainer: OverlayContainer;
   let overlayContainerElement: HTMLElement;
   let dir: {value: 'ltr'|'rtl', change: Observable<string>};
