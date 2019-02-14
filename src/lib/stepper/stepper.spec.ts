@@ -141,7 +141,7 @@ describe('MatStepper', () => {
       expect(selectedLabel.textContent).toMatch('New Label');
     });
 
-    it('should go to next available step when the next button is clicked', () => {
+    fit('should go to next available step when the next button is clicked', () => {
       let stepperComponent = fixture.debugElement.query(By.directive(MatStepper)).componentInstance;
 
       expect(stepperComponent.selectedIndex).toBe(0);

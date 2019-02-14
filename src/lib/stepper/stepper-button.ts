@@ -14,7 +14,6 @@ import {MatStepper} from './stepper';
 @Directive({
   selector: 'button[matStepperNext]',
   host: {
-    '(click)': '_stepper.next()',
     '[type]': 'type',
   },
   inputs: ['type'],
@@ -26,7 +25,6 @@ export class MatStepperNext extends CdkStepperNext {}
 @Directive({
   selector: 'button[matStepperPrevious]',
   host: {
-    '(click)': '_stepper.previous()',
     '[type]': 'type',
   },
   inputs: ['type'],
