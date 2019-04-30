@@ -87,6 +87,7 @@
 /src/material-experimental/mdc-button/**           @mmalerba # Note to implementer: please repossess
 /src/material-experimental/mdc-card/**             @mmalerba # Note to implementer: please repossess
 /src/material-experimental/mdc-checkbox/**         @mmalerba
+/src/material-experimental/mdc-chips/**            @mmalerba
 /src/material-experimental/mdc-helpers/**          @mmalerba
 /src/material-experimental/mdc-menu/**             @mmalerba # Note to implementer: please repossess
 /src/material-experimental/mdc-radio/**            @mmalerba # Note to implementer: please repossess
@@ -137,6 +138,7 @@
 /src/dev-app/mdc-button/**                         @mmalerba # Note to implementer: please repossess
 /src/dev-app/mdc-card/**                           @mmalerba # Note to implementer: please repossess
 /src/dev-app/mdc-checkbox/**                       @mmalerba
+/src/dev-app/mdc-chips/**                          @mmalerba
 /src/dev-app/mdc-menu/**                           @mmalerba # Note to implementer: please repossess
 /src/dev-app/mdc-radio/**                          @mmalerba # Note to implementer: please repossess
 /src/dev-app/mdc-slide-toggle/**                   @mmalerba # Note to implementer: please repossess
@@ -181,6 +183,7 @@
 /e2e/components/mdc-button-e2e.spec.ts             @mmalerba # Note to implementer: please repossess
 /e2e/components/mdc-card-e2e.spec.ts               @mmalerba # Note to implementer: please repossess
 /e2e/components/mdc-checkbox-e2e.spec.ts           @mmalerba
+/e2e/components/mdc-chips-e2e.spec.ts              @mmalerba
 /e2e/components/mdc-menu-e2e.spec.ts               @mmalerba # Note to implementer: please repossess
 /e2e/components/mdc-radio-e2e.spec.ts              @mmalerba # Note to implementer: please repossess
 /e2e/components/mdc-slide-toggle-e2e.spec.ts       @mmalerba # Note to implementer: please repossess
@@ -212,6 +215,7 @@
 /src/e2e-app/mdc-button/**                         @mmalerba # Note to implementer: please repossess
 /src/e2e-app/mdc-card/**                           @mmalerba # Note to implementer: please repossess
 /src/e2e-app/mdc-checkbox/**                       @mmalerba
+/src/e2e-app/mdc-chips/**                          @mmalerba
 /src/e2e-app/mdc-menu/**                           @mmalerba # Note to implementer: please repossess
 /src/e2e-app/mdc-radio/**                          @mmalerba # Note to implementer: please repossess
 /src/e2e-app/mdc-slide-toggle/**                   @mmalerba # Note to implementer: please repossess
