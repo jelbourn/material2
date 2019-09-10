@@ -1,5 +1,6 @@
 package(default_visibility = ["//visibility:public"])
 
+load("@io_bazel_rules_sass//:defs.bzl", "sass_binary")
 load(
     "//tools:defaults.bzl",
     "ng_module",
@@ -8,18 +9,23 @@ load(
 )
 
 ng_module(
-    name = "google-map",
+    name = "map-info-window",
     srcs = glob(
         ["**/*.ts"],
         exclude = ["**/*.spec.ts"],
     ),
+    assets = [":map-info-window.css"],
     deps = [
-        "//src/google-maps/map-info-window",
         "//src/google-maps/map-marker",
         "@npm//@angular/core",
         "@npm//@types/googlemaps",
         "@npm//rxjs",
     ],
+)
+
+sass_binary(
+    name = "map-info-window_scss",
+    src = "map-info-window.scss",
 )
 
 ng_test_library(
@@ -29,8 +35,7 @@ ng_test_library(
         exclude = ["**/*.e2e.spec.ts"],
     ),
     deps = [
-        ":google-map",
-        "//src/google-maps/map-info-window",
+        ":map-info-window",
         "//src/google-maps/map-marker",
         "//src/google-maps/testing",
         "@npm//@angular/platform-browser",
