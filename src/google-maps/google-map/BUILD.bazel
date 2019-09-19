@@ -14,7 +14,6 @@ ng_module(
         exclude = ["**/*.spec.ts"],
     ),
     deps = [
-        "//src/google-maps/map-info-window",
         "//src/google-maps/map-marker",
         "@npm//@angular/core",
         "@npm//@types/googlemaps",
@@ -30,7 +29,6 @@ ng_test_library(
     ),
     deps = [
         ":google-map",
-        "//src/google-maps/map-info-window",
         "//src/google-maps/map-marker",
         "//src/google-maps/testing",
         "@npm//@angular/platform-browser",
