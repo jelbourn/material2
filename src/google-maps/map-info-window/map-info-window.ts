@@ -20,11 +20,7 @@ import {MapMarker} from '../map-marker/index';
  */
 @Component({
   selector: 'map-info-window',
-  template: `<div class="map-info-window-container">
-               <div #infoWindowContent class="map-info-window-content">
-                 <ng-content></ng-content>
-               </div>
-             </div>`,
+  template: `<ng-content></ng-content>`,
   styleUrls: ['map-info-window.css'],
 })
 export class MapInfoWindow implements OnInit, OnDestroy {
@@ -71,14 +67,8 @@ export class MapInfoWindow implements OnInit, OnDestroy {
    */
   @Output() zindexChanged = new EventEmitter<void>();
 
-  @ViewChild('infoWindowContent', {static: false})
-  set content(content: ElementRef) {
-    this._content.next(content.nativeElement);
-  }
-
   private readonly _options = new BehaviorSubject<google.maps.InfoWindowOptions>({});
   private readonly _position = new BehaviorSubject<google.maps.LatLngLiteral|undefined>(undefined);
-  private readonly _content = new ReplaySubject<Node>(1);
 
   private readonly _listeners: google.maps.MapsEventListener[] = [];
 
@@ -86,7 +76,9 @@ export class MapInfoWindow implements OnInit, OnDestroy {
 
   private _infoWindow?: google.maps.InfoWindow;
 
-  constructor(private readonly googleMap: GoogleMap) {}
+  constructor(
+      private readonly googleMap: GoogleMap,
+      private readonly _elementRef: ElementRef<HTMLElement>) {}
 
   ngOnInit() {
     this._combineOptions().pipe(takeUntil(this._destroy)).subscribe(options => {
@@ -154,12 +146,12 @@ export class MapInfoWindow implements OnInit, OnDestroy {
   }
 
   private _combineOptions(): Observable<google.maps.InfoWindowOptions> {
-    return combineLatest(this._options, this._position, this._content)
-        .pipe(map(([options, position, content]) => {
+    return combineLatest(this._options, this._position)
+        .pipe(map(([options, position]) => {
           const combinedOptions: google.maps.InfoWindowOptions = {
             ...options,
             position: position || options.position,
-            content,
+            content: this._elementRef.nativeElement,
           };
           return combinedOptions;
         }));
