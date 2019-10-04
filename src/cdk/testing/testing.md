@@ -1,26 +1,29 @@
-The `testing` package provides infrastructure to help with testing Angular components.
+`@angular/cdk/testing` provides infrastructure to help with testing Angular components.
 
-### Component harnesses infrastructure
+### Component test harnesses
 
-The primary piece of infrastructure in this package is a set of classes for building component
-harnesses and using them in tests. Component harnesses give tests a way to interact with a
-particular Angular component through an intentionally designed interface.
+A component harness is a class that lets a test interact with a component via a supported API.
+Each harness's API interacts with a component the same way a user would. By using the harness API,
+a test insulates itself against updates to the internals of a component, such as changing its DOM
+structure. The idea for component harnesses comes from the
+[PageObject](https://martinfowler.com/bliki/PageObject.html) pattern commonly used for integration
+testing.
 
-It can be especially helpful for authors of component libraries to create harnesses for their
-components, as it gives users a way to avoid depending on implementation details of the library's
-components, and makes it easier to roll out changes to the library.
+`@angular/cdk/testing` contains infrastructure for _creating_ component test harnesses. You can
+create test harnesses for any component, ranging from small reusable widgets to full application
+pages. 
 
-If a component library provides component harnesses, users of the library should strongly consider
-taking advantage of the harnesses in their tests. Using the harnesses can help make tests easier to
-understand and more robust with respect to changes in the library.
+The component harness system supports multiple testing environments. You can use the same harness
+implementation in both unit and end-to-end tests. This means that users only need to learn one API,
+and component authors don't have to maintain separate unit and end-to-end test implementations.
 
-The component harness system is designed to be able to support multiple testing environments.
-Therefore it is possible to use the same harness object in both unit and end-to-end tests. This is
-convenient for both users and authors of the harnesses. Users only need to learn one API, and
-authors don't have to maintain separate unit and end-to-end test implementations.
+Common component libraries, in particular, benefit from this infrastrucure
+due to the wide use of their components. By providing a test harnesses, the consumers of a
+component can write tests that avoid dependencies on any private implentation details. By
+caputring these implementation details in a single place, consumers can more easily update to new
+library versions.
 
-The APIs provided in this package can be looked at through the lens of several different types of
-users (each user type is described in more detail in its corresponding section):
+This document provides guidance for three types of developers:
 1. [Test authors](#api-for-test-authors)
 2. [Component harness authors](#api-for-component-harness-authors)
 3. [Harness environment authors](#api-for-harness-environment-authors)
@@ -30,29 +33,44 @@ type in the sections below.
 
 ### API for test authors
 
-Test authors are users that want to use existing component harnesses when testing their own
-application. For example, this could be an app developer who uses Angular Material. Angular Material
-offers component harnesses for this developer to use in their tests when interacting with Angular
-Material components.
+Test authors are developers using component harnesses written by someone else to test their
+application. For example, this could be an app developer who uses a third-party menu component
+and needs to interact with the menu in a unit test.
 
 #### `TestbedHarnessEnvironment` and `ProtractorHarnessEnvironment`
 
 These classes correspond to different implementations of the component harness system with bindings
-for different test environments. Any given test should only import _one_ of these classes.
+for specific test environments. Any given test must only import _one_ of these classes.
 Karma-based unit tests should use the `TestbedHarnessEnvironment`, while Protractor-based end-to-end
-tests should use the `ProtractorHarnessEnvironment`. Currently, any other environments will need
-custom bindings (see [API for harness environment authors](#api-for-harness-environment-authors)).
+tests should use the `ProtractorHarnessEnvironment`. Additonal environments require
+custom bindings; see [API for harness environment authors](#api-for-harness-environment-authors))
+for more information on alternate test environments.
 
-These classes are primarily used to create a `HarnessLoader` instances, and in certain cases, to
+These classes are primarily used to create a `HarnessLoader` instance, and in certain cases, to
 create `ComponentHarness` instances directly.
 
 `TestbedHarnessEnvironment` offers the following static methods:
 
-| Method | Description |
-| ------ | ----------- |
-| `loader(fixture: ComponentFixture<unknown>): HarnessLoader` | Gets a `HarnessLoader` instance for the given fixture, rooted at the fixture's root element. Should be used to create harnesses for elements contained inside the fixture |
-| `documentRootLoader(fixture: ComponentFixture<unknown>): HarnessLoader` | Gets a `HarnessLoader` instance for the given fixture, rooted at the HTML document's root element. Can be used to create harnesses for elements that fall outside of the fixture |
-| `harnessForFixture<T extends ComponentHarness>(fixture: ComponentFixture<unknown>, harnessType: ComponentHarnessConstructor<T>): Promise<T>` | Used to create a `ComponentHarness` instance for the fixture's root element directly. This is necessary when bootstrapping the test with the component you plan to load a harness for, because Angular does not set the proper tag name when creating the fixture. |
+| Method                            | Description                             |
+| --------------------------------- | --------------------------------------- |
+| `loader(fixture:                  | Gets a `HarnessLoader` instance for the |
+: ComponentFixture<unknown>)\:      : given fixture, rooted at the fixture's  :
+: HarnessLoader`                    : root element. Should be used to create  :
+:                                   : harnesses for elements contained inside :
+:                                   : the fixture                             :
+| `documentRootLoader(fixture:      | Gets a `HarnessLoader` instance for the |
+: ComponentFixture<unknown>)\:      : given fixture, rooted at the HTML       :
+: HarnessLoader`                    : document's root element. Can be used to :
+:                                   : create harnesses for elements that fall :
+:                                   : outside of the fixture                  :
+| `harnessForFixture<T extends      | Used to create a `ComponentHarness`     |
+: ComponentHarness>(fixture\:       : instance for the fixture's root element :
+: ComponentFixture<unknown>,        : directly. This is necessary when        :
+: harnessType\:                     : bootstrapping the test with the         :
+: ComponentHarnessConstructor<T>)\: : component you plan to load a harness    :
+: Promise<T>`                       : for, because Angular does not set the   :
+:                                   : proper tag name when creating the       :
+:                                   : fixture.                                :
 
 In most cases, it is sufficient to just create a `HarnessLoader` in the `beforeEach` clause using
 `TestbedHarnessEnvironment.loader(fixture)` and then use that `HarnessLoader` to create any
