@@ -23,7 +23,7 @@
     "skipLibCheck": true,
     "types": ["tslib"],
     "outDir": "../../dist/packages/cdk",
-    "rootDir": "."
+    "rootDir": "../.."
   },
   "files": [
     "array.ts"
