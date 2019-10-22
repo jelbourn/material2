@@ -9,3 +9,4 @@
 export * from './clipboard';
 export * from './clipboard-module';
 export * from './copy-to-clipboard';
+export {PendingCopy} from './pending-copy';

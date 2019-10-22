@@ -219,7 +219,7 @@ export class StickyStyler {
     };
 
     let zIndex = 0;
-    for (const dir of STICKY_DIRECTIONS) {
+    for (const dir of STICKY_DIRECTIONS as Iterable<StickyDirection>) {
       if (element.style[dir]) {
         zIndex += zIndexIncrements[dir];
       }
