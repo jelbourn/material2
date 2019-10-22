@@ -3,11 +3,30 @@
 // ensure the TypeScript build options are the same for Gulp and Bazel. We achieve this by
 // extending the generic Bazel build tsconfig which will be used for each entry-point.
 {
-  "extends": "../bazel-tsconfig-build.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "outDir": "../../dist/packages/cdk",
-    "rootDir": "."
+    "declaration": true,
+    "stripInternal": false,
+    "experimentalDecorators": true,
+    "noUnusedParameters": false,
+    "noUnusedLocals": false,
+    "strictNullChecks": true,
+    "noImplicitReturns": true,
+    "strictFunctionTypes": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "importHelpers": true,
+    "newLine": "lf",
+    "module": "es2015",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "inlineSources": true,
+    "target": "es2015",
+    "lib": ["es2015", "dom"],
+    "skipLibCheck": true,
+    "types": ["tslib"],
+    "outDir": "../../dist/packages/cdk"
   },
   "angularCompilerOptions": {
     "enableIvy": false,
