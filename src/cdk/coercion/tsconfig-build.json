@@ -25,7 +25,7 @@
     "outDir": "../../dist/packages/cdk"
   },
   "files": [
-    "public-api.ts"
+    "array.ts"
   ],
   "angularCompilerOptions": {
     "annotateForClosureCompiler": true,
