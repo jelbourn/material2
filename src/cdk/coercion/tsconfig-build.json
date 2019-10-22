@@ -22,8 +22,8 @@
     "lib": ["es2015", "dom"],
     "skipLibCheck": true,
     "types": ["tslib"],
-    "outDir": "../../dist/packages/cdk",
-    "rootDir": "../.."
+    "outDir": "../../../dist/packages/cdk",
+    "rootDir": ".",
   },
   "files": [
     "array.ts"
