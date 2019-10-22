@@ -7,19 +7,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "outDir": "../../dist/packages/cdk",
-    "rootDir": ".",
-    "rootDirs": [
-      ".",
-      "../../dist/packages/cdk"
-    ],
-    "paths": {
-      "@angular/cdk/*": ["../../dist/packages/cdk/*"]
-    }
+    "rootDir": "."
   },
-  "files": [
-    "public-api.ts",
-    "typings.d.ts"
-  ],
   "angularCompilerOptions": {
     "enableIvy": false,
     "annotateForClosureCompiler": true,
