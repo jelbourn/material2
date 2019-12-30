@@ -38,17 +38,21 @@ explicitly set by calling `MatIconRegistry.setDefaultFontSetClass`.
 ### SVG icons
 
 When an `mat-icon` component displays an SVG icon, it does so by directly inlining the SVG content
-into the page as a child of the component. (Rather than using an `<img>` tag or a div background
+into the page as a child of the component. (Rather than using an `<img>` tag or a `div` background
 image). This makes it easier to apply CSS styles to SVG icons. For example, the default color of the
 SVG content is the CSS
 [currentColor](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#currentColor_keyword)
 value. This makes SVG icons by default have the same color as surrounding text, and allows you to
-change the color by setting the "color" style on the `mat-icon` element.
+change the color by setting the `color` style on the `mat-icon` element.
 
 In order to prevent XSS vulnerabilities, any SVG URLs and HTML strings passed to the
 `MatIconRegistry` must be marked as trusted by using Angular's `DomSanitizer` service.
 
-Also note that all SVG icons, registered by URL, are fetched via XmlHttpRequest, and due to the
+To fetch remote SVG icons, the `MatIconRegistry` uses Angular's `HttpClient` service. If you haven't
+included the [`HttpClientModule` from the `@angular/common/http` package](https://angular.io/guide/http)
+in your module's `imports`, you will get an error at runtime.
+
+Note that all SVG icons, registered by URL, are fetched via XmlHttpRequest, and due to the
 same-origin policy, their URLs must be on the same domain as the containing page, or their servers
 must be configured to allow cross-domain access.
 
@@ -107,8 +111,8 @@ some icon on the page, a more appropriate  element should "own" the interaction:
 direct text content, `aria-label`, or `aria-labelledby`.
 
 #### Indicator icons
-When the presence of an icon communicates some information to the user whether as an indicator or 
-by being inlined into a block of text, that information must also be made available to 
+When the presence of an icon communicates some information to the user whether as an indicator or
+by being inlined into a block of text, that information must also be made available to
 screen-readers. The most straightforward way to do this is to
 1. Add a `<span>` as an adjacent sibling to the `<mat-icon>` element with text that conveys the same
 information as the icon.
@@ -118,7 +122,7 @@ on-screen but still available to screen-reader users.
 ### Bidirectionality
 
 By default icons in an RTL layout will look exactly the same as in LTR, however certain icons have
-to be [mirrored for RTL users](https://material.io/guidelines/usability/bidirectionality.html). If
+to be [mirrored for RTL users](https://material.io/design/usability/bidirectionality.html). If
 you want to mirror an icon only in an RTL layout, you can use the `mat-icon-rtl-mirror` CSS class.
 
 ```html
