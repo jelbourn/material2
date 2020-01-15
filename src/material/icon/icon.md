@@ -37,24 +37,25 @@ explicitly set by calling `MatIconRegistry.setDefaultFontSetClass`.
 
 ### SVG icons
 
-When an `mat-icon` component displays an SVG icon, it does so by directly inlining the SVG content
-into the page as a child of the component. (Rather than using an `<img>` tag or a `div` background
-image). This makes it easier to apply CSS styles to SVG icons. For example, the default color of the
+`<mat-icon>` displays SVG icons by directly inlining the SVG content into the DOM
+as a child of itself. This approach offers an advantage over an `<img>` tag or a CSS
+`background-image` because it allows styling the SVG with CSS. For example, the default color of the
 SVG content is the CSS
 [currentColor](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value#currentColor_keyword)
 value. This makes SVG icons by default have the same color as surrounding text, and allows you to
 change the color by setting the `color` style on the `mat-icon` element.
 
-In order to prevent XSS vulnerabilities, any SVG URLs and HTML strings passed to the
+In order to guard against XSS vulnerabilities, any SVG URLs and HTML strings passed to the
 `MatIconRegistry` must be marked as trusted by using Angular's `DomSanitizer` service.
 
-To fetch remote SVG icons, the `MatIconRegistry` uses Angular's `HttpClient` service. If you haven't
-included the [`HttpClientModule` from the `@angular/common/http` package](https://angular.io/guide/http)
-in your module's `imports`, you will get an error at runtime.
+`MatIconRegistry` fetches all remote SVG icons via Angular's `HttpClient` service. If you haven't
+included [`HttpClientModule` from the `@angular/common/http` package](https://angular.io/guide/http)
+in your `NgModule` imports, you will get an error at runtime.
 
-Note that all SVG icons, registered by URL, are fetched via XmlHttpRequest, and due to the
-same-origin policy, their URLs must be on the same domain as the containing page, or their servers
-must be configured to allow cross-domain access.
+Note that `HttpClient` fetches SVG icons registered with a URL via `XmlHttpRequest`, subject to the
+[Same-origin policy](https://developer.mozilla.org/en-US/docs/Web/Security/Same-origin_policy). This
+means that icon URLs must have the same origin as the containing page or that the application's
+server must be configured to allow cross-origin requests. 
 
 #### Named icons
 
