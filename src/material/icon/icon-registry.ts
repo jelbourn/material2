@@ -358,26 +358,9 @@ export class MatIconRegistry implements OnDestroy {
 
     // Not found in any cached icon sets. If there are icon sets with URLs that we haven't
     // fetched, fetch them now and look for iconName in the results.
-    const iconSetFetchRequests: Observable<null>[] = iconSetConfigs
-      .filter(iconSetConfig => !iconSetConfig.svgText)
-      .map(iconSetConfig => {
-        return this._loadSvgIconSetFromConfig(iconSetConfig).pipe(
-          catchError((err: HttpErrorResponse): Observable<null> => {
-            const url = this._sanitizer.sanitize(SecurityContext.RESOURCE_URL, iconSetConfig.url);
-
-            // Swallow errors fetching individual URLs so the
-            // combined Observable won't necessarily fail.
-            const errorMessage = `Loading icon set URL: ${url} failed: ${err.message}`;
-            // @breaking-change 9.0.0 _errorHandler parameter to be made required
-            if (this._errorHandler) {
-              this._errorHandler.handleError(new Error(errorMessage));
-            } else {
-              console.error(errorMessage);
-            }
-            return observableOf(null);
-          })
-        );
-      });
+    const iconSetFetchRequests: Observable<string | null>[] = iconSetConfigs
+        .filter(iconSetConfig => !iconSetConfig.svgText)
+        .map(iconSetConfig => this._fetchSvgIconSetFromConfig(iconSetConfig));
 
     // Fetch all the icon set URLs. When the requests complete, every IconSet should have a
     // cached SVG element (unless the request failed), and we can check again for the icon.
@@ -390,6 +373,25 @@ export class MatIconRegistry implements OnDestroy {
 
       return foundIcon;
     }));
+  }
+
+  /**
+   * Reports an HTTP error encountered when fetching an icon set. This will be done using
+   * the injected ErrorHandler if one exists, otherwise falling back to `console.error`.
+   */
+  private _reportIconSetFetchError(error: HttpErrorResponse): Observable<null> {
+    const url = this._sanitizer.sanitize(SecurityContext.RESOURCE_URL, error.url);
+
+    // Swallow errors fetching individual URLs so the
+    // combined Observable won't necessarily fail.
+    const errorMessage = `Loading icon set URL: ${url} failed: ${error.message}`;
+    // @breaking-change 9.0.0 _errorHandler parameter to be made required
+    if (this._errorHandler) {
+      this._errorHandler.handleError(new Error(errorMessage));
+    } else {
+      console.error(errorMessage);
+    }
+    return observableOf(null);
   }
 
   /**
@@ -433,12 +435,16 @@ export class MatIconRegistry implements OnDestroy {
    * Loads the content of the icon set URL specified in the
    * SvgIconConfig and attaches it to the config.
    */
-  private _loadSvgIconSetFromConfig(config: SvgIconConfig): Observable<null> {
+  private _fetchSvgIconSetFromConfig(config: SvgIconConfig): Observable<string | null> {
     if (config.svgText) {
       return observableOf(null);
     }
 
-    return this._fetchUrl(config.url).pipe(tap(svgText => config.svgText = svgText), mapTo(null));
+    // Fetch the icon set. Use `tap` to cache the result for subsequent requests. In case of
+    // errors, pipe through `null`.
+    return this._fetchUrl(config.url).pipe(
+        tap(svgText => config.svgText = svgText),
+        catchError((error: HttpErrorResponse) => this._reportIconSetFetchError(error)));
   }
 
   /**
