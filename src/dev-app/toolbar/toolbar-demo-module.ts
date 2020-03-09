@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import {ToolbarExamplesModule} from '@angular/components-examples/material/toolbar';
 import {NgModule} from '@angular/core';
 import {MatButtonModule} from '@angular/material/button';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -24,6 +25,7 @@ import {ToolbarDemo} from './toolbar-demo';
     MatInputModule,
     MatSelectModule,
     MatToolbarModule,
+    ToolbarExamplesModule,
     RouterModule.forChild([{path: '', component: ToolbarDemo}]),
   ],
   declarations: [ToolbarDemo],
