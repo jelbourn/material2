@@ -110,3 +110,17 @@ $_default-config: (
       $themeOrColor);
   }
 }
+
+@mixin mat-button-strong-focus($config: null) {
+  .mat-focus-indicator.mat-button-base::before {
+
+    // TODO: Validate that $config only includes border-radius,
+    // border-width, margin, border-color, and border-style.
+
+    @each $key, $value in $config {
+      @if ($key and $value) {
+        #{$key}: #{$value};
+      }
+    }
+  }
+}
