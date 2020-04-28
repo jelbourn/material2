@@ -1,10 +1,27 @@
 @import '../theming/theming';
 @import '../style/layout-common';
 
-// Focus indicator styles.
-$mat-focus-indicator-border-radius: 4px;
-$mat-focus-indicator-border-width: 2px;
-$mat-focus-indicator-border-style: solid;
+// Default focus indicator styles.
+$_default-config: (
+  border-style: solid,
+  border-radius: 4px,
+  border-width: 2px,
+);
+
+// Gets a config object with any missing keys added (using default values).
+@function _get-config-with-defaults($user-config) {
+  @if (not $user-config) {
+    @return $_default-config;
+  }
+
+  @each $key, $value in $_default-config {
+    @if (not map-get($user-config, $key)) {
+      $user-config: map-merge($user-config, ($key, $value));
+    }
+  }
+
+  @return $user-config;
+}
 
 /// Mixin that turns on strong focus indicators.
 ///
@@ -12,14 +29,20 @@ $mat-focus-indicator-border-style: solid;
 ///   .my-app {
 ///     @include mat-strong-focus-indicators();
 ///   }
-@mixin mat-strong-focus-indicators() {
+@mixin mat-strong-focus-indicators($user-config: null) {
+  $config: _get-config-with-defaults($user-config);
+  $border-radius: map-get($config, border-radius);
+  $border-width: map-get($config, border-width);
+  $border-style: map-get($config, border-style);
+
+  $inset-outset-step: 2px;
 
   // Base styles for the focus indicators.
   .mat-focus-indicator::before {
     @include mat-fill();
 
-    border-radius: $mat-focus-indicator-border-radius;
-    border: $mat-focus-indicator-border-width $mat-focus-indicator-border-style transparent;
+    border-radius: $border-radius;
+    border: $border-width $border-style transparent;
     box-sizing: border-box;
     pointer-events: none;
   }
@@ -33,16 +56,16 @@ $mat-focus-indicator-border-style: solid;
   .mat-focus-indicator.mat-card::before,
   .mat-focus-indicator.mat-chip::before,
   .mat-focus-indicator.mat-sort-header-button::before {
-    margin: $mat-focus-indicator-border-width * -2;
+    margin: $inset-outset-step * -2;
   }
 
   .mat-focus-indicator.mat-calendar-body-cell::before {
-    margin: $mat-focus-indicator-border-width * -1;
+    margin: $inset-outset-step * -1;
   }
 
   .mat-focus-indicator.mat-tab-link::before,
   .mat-focus-indicator.mat-tab-label::before {
-    margin: $mat-focus-indicator-border-width * 2;
+    margin: $inset-outset-step * 2;
   }
 
   // Render the focus indicator on focus. Defining a pseudo element's
