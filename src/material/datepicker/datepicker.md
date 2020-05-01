@@ -37,14 +37,14 @@ by using the `matDatepickerToggleIcon` directive:
 
 <!-- example(datepicker-custom-icon) -->
 
-### Selecting a range of dates
+### Date range selection
 
 If you want your users to select a range of dates, instead of a single date, you can use the
-`mat-date-range-picker` and `mat-date-range-input` components. They work in a similar way to the
+`mat-date-range-input` and `mat-date-range-picker` components. They work in similarly to the
 `mat-datepicker` and the basic datepicker input.
 
-First of all, you have to add a `mat-date-range-input` with two `input` elements into which the
-user can type the start and end dates:
+The `mat-date-range-input` component requires two `input` elements for the start and end dates,
+respectively: 
 
 ```html
 <mat-date-range-input>
@@ -53,14 +53,14 @@ user can type the start and end dates:
 </mat-date-range-input>
 ```
 
-Afterwards you have to add a `mat-date-range-picker` element which works in the same way as
-`mat-datepicker`, but allows the user to select multiple times:
+The `mat-date-range-picker` component acts the the pop-up panel for selecting dates. This works in
+the same way as `mat-datepicker`, but allows the user to select multiple times:
 
 ```html
 <mat-date-range-picker #picker></mat-date-range-picker>
 ```
 
-Finally, you have to connect the range picker and range input using the `rangePicker` binding:
+Connect the range picker and range input using the `rangePicker` property:
 
 ```html
 <mat-date-range-input [rangePicker]="picker">
@@ -221,11 +221,10 @@ to limitations in the Material Design theming system. They can be customized usi
 
 ### Customizing the date selection logic
 
-If you want to control how the date range picker behaves when the user is previewing a date and
-how the range is changed when they've selected a date, you can do so by providing a new range
-selection strategy using the `MAT_CALENDAR_RANGE_SELECTION_STRATEGY` injection token. The provided
-value has to implement the `MatCalendarRangeSelectionStrategy` interface. In the following example,
-we use the range selection strategy to create a custom range picker that limits the user to five-day
+The date-range-picker supports custom behaviors for range previews and selection. To customize
+this, you first create a class that implements `MatCalendarRangeSelectionStrategy`, and then provide
+this class via the `MAT_CALENDAR_RANGE_SELECTION_STRATEGY` injection token. The following example
+uses the range selection strategy to create a custom range picker that limits the user to five-day
 ranges.
 
 <!-- example(date-range-picker-selection-strategy) -->
