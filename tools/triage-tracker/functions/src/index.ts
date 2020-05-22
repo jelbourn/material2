@@ -18,10 +18,44 @@ export const logGitHubEvent = functions.https.onRequest(async (req, response) =>
     return response.status(403).send('x-hub-signature does not match expected signature');
   }
 
-  // const event = request.body;
-  // const snapshot = await admin.database().ref('/messages').push({original: request});
-  console.log(JSON.stringify(req.body));
+  // We only care about label events for the fix-it
+  if (req.body.action === 'labeled') {
+
+    // Handle events differently for each repo.
+    switch (req.body.full_name) {
+      case ('angular/components'):
+        await processComponentsEvent(req.body);
+        break;
+    }
+  }
 
   return response.status(200).send();
 });
 
+async function processComponentsEvent(event: any) {
+  const priorityLabelExp = /P\d/;
+  if (priorityLabelExp.test(event.label.name)) {
+    const triageData: TriageData = {
+      issueNumber: event.issue.number,
+      label: event.label.name,
+      user: event.sender.login,
+      timestamp: Date.now(),
+    };
+
+    return writeEventToDatabase('components', triageData);
+  }
+
+  return Promise.resolve();
+}
+
+async function writeEventToDatabase(repo: string, triageData: TriageData) {
+  return admin.database().ref('/messages').push(triageData);
+}
+
+
+interface TriageData {
+  issueNumber: string;
+  label: string;
+  user: string;
+  timestamp: number;
+}
