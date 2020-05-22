@@ -18,7 +18,7 @@ export const logGitHubEvent = functions.https.onRequest(async (req, response) =>
     return response.status(403).send('x-hub-signature does not match expected signature');
   }
   // We only care about label events for the fix-it
-  if (req.body.action === 'labeled') {
+  if (req.body.action === 'labeled' || req.body.action === 'closed') {
 
     // Handle events differently for each repo.
     switch (req.body.repository.full_name) {
@@ -32,27 +32,30 @@ export const logGitHubEvent = functions.https.onRequest(async (req, response) =>
 });
 
 async function processComponentsEvent(event: any) {
-  const priorityLabelExp = /P\d/;
-  if (priorityLabelExp.test(event.label.name)) {
-    const triageData: TriageData = {
+  const triageLabelExp = /(P\d)|(needs clarification)|(cannot reproduce)/;
+  const triageLabel = triageLabelExp.test(event.label.name) ? event.label.name : '';
+  if (event.action === 'closed' || triageLabel) {
+    return writeEventToDatabase('components', {
+      action: event.action,
       issueNumber: event.issue.number,
-      label: event.label.name,
+      label: triageLabel,
       user: event.sender.login,
       timestamp: Date.now(),
-    };
-    return writeEventToDatabase('components', triageData);
+    });
   }
 
   return Promise.resolve();
 }
 
 async function writeEventToDatabase(repo: string, triageData: TriageData) {
-  return admin.database().ref(`/${repo}`).push(triageData);
+  // Use `set` rather than push so that we key by issue number.
+  return admin.database().ref(`/${repo}/${triageData.issueNumber}`).set(triageData);
 }
 
 
 interface TriageData {
   issueNumber: string;
+  action: string;
   label: string;
   user: string;
   timestamp: number;
