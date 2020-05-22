@@ -17,12 +17,11 @@ export const logGitHubEvent = functions.https.onRequest(async (req, response) =>
     console.error('x-hub-signature', signatureFromGithub, 'did not match', expectedSignature);
     return response.status(403).send('x-hub-signature does not match expected signature');
   }
-
   // We only care about label events for the fix-it
   if (req.body.action === 'labeled') {
 
     // Handle events differently for each repo.
-    switch (req.body.full_name) {
+    switch (req.body.repository.full_name) {
       case ('angular/components'):
         await processComponentsEvent(req.body);
         break;
@@ -41,7 +40,6 @@ async function processComponentsEvent(event: any) {
       user: event.sender.login,
       timestamp: Date.now(),
     };
-
     return writeEventToDatabase('components', triageData);
   }
 
@@ -49,7 +47,7 @@ async function processComponentsEvent(event: any) {
 }
 
 async function writeEventToDatabase(repo: string, triageData: TriageData) {
-  return admin.database().ref('/messages').push(triageData);
+  return admin.database().ref(`/${repo}`).push(triageData);
 }
 
 
