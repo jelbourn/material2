@@ -18,7 +18,7 @@ export const logGitHubEvent = functions.https.onRequest(async (req, response) =>
     return response.status(403).send('x-hub-signature does not match expected signature');
   }
   // We only care about label events for the fix-it
-  if (req.body.action === 'labeled' || req.body.action === 'closed') {
+  if (req.body.action === 'labeled' || req.body.action === 'closed' || req.body.action === 'unlabeled') {
 
     // Handle events differently for each repo.
     switch (req.body.repository.full_name) {
@@ -43,7 +43,7 @@ async function processComponentsEvent(event: any) {
 
   const triageLabelExp = /(P\d)|(needs clarification)|(cannot reproduce)/;
   const triageLabel = event.label && triageLabelExp.test(event.label.name) ? event.label.name : '';
-  if (event.action === 'closed' || triageLabel) {
+  if (event.action === 'closed' || (triageLabel && event.action === 'labeled')) {
     return writeTriageEventToDatabase('components', {
       action: event.action,
       issueNumber: event.issue.number,
