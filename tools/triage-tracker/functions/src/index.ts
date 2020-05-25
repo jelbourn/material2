@@ -32,10 +32,19 @@ export const logGitHubEvent = functions.https.onRequest(async (req, response) =>
 });
 
 async function processComponentsEvent(event: any) {
+  // Log ALL events in case we want extra data
+  await logActionToDatabase('components', {
+      action: event.action,
+      issueNumber: event.issue.number,
+      label: event.label.name,
+      user: event.sender.login,
+      timestamp: Date.now(),
+  });
+
   const triageLabelExp = /(P\d)|(needs clarification)|(cannot reproduce)/;
-  const triageLabel = triageLabelExp.test(event.label.name) ? event.label.name : '';
+  const triageLabel = event.label && triageLabelExp.test(event.label.name) ? event.label.name : '';
   if (event.action === 'closed' || triageLabel) {
-    return writeEventToDatabase('components', {
+    return writeTriageEventToDatabase('components', {
       action: event.action,
       issueNumber: event.issue.number,
       label: triageLabel,
@@ -47,11 +56,15 @@ async function processComponentsEvent(event: any) {
   return Promise.resolve();
 }
 
-async function writeEventToDatabase(repo: string, triageData: TriageData) {
+async function writeTriageEventToDatabase(repo: string, triageData: TriageData) {
   // Use `set` rather than push so that we key by issue number.
   return admin.database().ref(`/${repo}/${triageData.issueNumber}`).set(triageData);
 }
 
+async function logActionToDatabase(repo: string, triageData: TriageData) {
+  // Use `set` rather than push so that we key by issue number.
+  return admin.database().ref(`/${repo}-actions/${triageData.issueNumber}`).push(triageData);
+}
 
 interface TriageData {
   issueNumber: string;
