@@ -36,13 +36,13 @@ async function processComponentsEvent(event: any) {
   await logActionToDatabase('components', {
       action: event.action,
       issueNumber: event.issue.number,
-      label: event.label.name,
+      label: event.label?.name,
       user: event.sender.login,
       timestamp: Date.now(),
   });
 
   const triageLabelExp = /(P\d)|(needs clarification)|(cannot reproduce)/;
-  const triageLabel = event.label && triageLabelExp.test(event.label.name) ? event.label.name : '';
+  const triageLabel = (event.label && triageLabelExp.test(event.label.name)) ? event.label.name : '';
   if (event.action === 'closed' || (triageLabel && event.action === 'labeled')) {
     return writeTriageEventToDatabase('components', {
       action: event.action,
