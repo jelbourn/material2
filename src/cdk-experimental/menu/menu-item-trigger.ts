@@ -28,10 +28,27 @@ import {
   FlexibleConnectedPositionStrategy,
 } from '@angular/cdk/overlay';
 import {SPACE, ENTER, RIGHT_ARROW, LEFT_ARROW, DOWN_ARROW, UP_ARROW} from '@angular/cdk/keycodes';
+import {Subject} from 'rxjs';
+import {takeUntil} from 'rxjs/operators';
 import {CdkMenuPanel} from './menu-panel';
 import {Menu, CDK_MENU} from './menu-interface';
-import {FocusNext} from './menu-stack';
 import {throwExistingMenuStackError} from './menu-errors';
+import {FocusNext, MenuStack} from './menu-stack';
+import {BackgroundClickService, CloseDecider, CLOSE_DECIDER} from './background-click-service';
+
+/** Whether the standalone menu should be closed. */
+function shouldCloseMenu(target: Element | null) {
+  while (target) {
+    if (
+      (target.classList.contains('cdk-menu') && !target.classList.contains('cdk-menu-inline')) ||
+      target.classList.contains('cdk-standalone-menu-item')
+    ) {
+      return false;
+    }
+    target = target.parentElement;
+  }
+  return true;
+}
 
 /**
  * A directive to be combined with CdkMenuItem which opens the Menu it is bound to. If the
@@ -49,7 +66,6 @@ import {throwExistingMenuStackError} from './menu-errors';
     '(keydown)': '_toggleOnKeydown($event)',
     '(mouseenter)': '_toggleOnMouseEnter()',
     '(click)': 'toggle()',
-    'tabindex': '-1',
     'aria-haspopup': 'menu',
     '[attr.aria-expanded]': 'isMenuOpen()',
   },
@@ -90,13 +106,32 @@ export class CdkMenuItemTrigger implements OnDestroy {
   /** The content of the menu panel opened by this trigger. */
   private _panelContent: TemplatePortal;
 
+  /** Emits when this trigger is destroyed. */
+  private readonly _destroyed: Subject<void> = new Subject();
+
+  /** The menu stack for this trigger and its sub-menus. */
+  _menuStack: MenuStack = new MenuStack();
+
   constructor(
     private readonly _elementRef: ElementRef<HTMLElement>,
     protected readonly _viewContainerRef: ViewContainerRef,
     private readonly _overlay: Overlay,
-    @Inject(CDK_MENU) private readonly _parentMenu: Menu,
+    private readonly _closeService: BackgroundClickService,
+    @Optional()
+    @Inject(CLOSE_DECIDER)
+    private readonly _closeHandler?: CloseDecider,
+    @Optional() @Inject(CDK_MENU) private readonly _parentMenu?: Menu,
     @Optional() private readonly _directionality?: Directionality
-  ) {}
+  ) {
+    this._registerCloseHandler();
+
+    // If there is no parent menu, this is a standalone trigger so we use the standalone trigger
+    // close handler. If the parent is defined, the trigger should (optionally) inject the close
+    // handler (sub-menus shouldn't inject).
+    if (!_parentMenu) {
+      this._closeHandler = shouldCloseMenu;
+    }
+  }
 
   /** Open/close the attached menu if the trigger has been configured with one */
   toggle() {
@@ -112,6 +147,10 @@ export class CdkMenuItemTrigger implements OnDestroy {
 
       this._overlayRef = this._overlayRef || this._overlay.create(this._getOverlayConfig());
       this._overlayRef.attach(this._getPortal());
+
+      if (this._closeHandler) {
+        this._closeService.startListener(this._closeHandler, this._getMenuStack());
+      }
     }
   }
 
@@ -149,7 +188,7 @@ export class CdkMenuItemTrigger implements OnDestroy {
    */
   _toggleOnMouseEnter() {
     const menuStack = this._getMenuStack();
-    const isSiblingMenuOpen = !menuStack?.isEmpty() && !this.isMenuOpen();
+    const isSiblingMenuOpen = !menuStack.isEmpty() && !this.isMenuOpen();
     if (isSiblingMenuOpen) {
       this._closeSiblingTriggers();
       this.openMenu();
@@ -172,10 +211,10 @@ export class CdkMenuItemTrigger implements OnDestroy {
         break;
 
       case RIGHT_ARROW:
-        if (this._isParentVertical()) {
+        if (this._parentMenu && this._isParentVertical()) {
           event.preventDefault();
           if (this._directionality?.value === 'rtl') {
-            this._getMenuStack()?.close(this._parentMenu, FocusNext.currentItem);
+            this._getMenuStack().close(this._parentMenu, FocusNext.currentItem);
           } else {
             this.openMenu();
             this.menuPanel?._menu?.focusFirstItem('keyboard');
@@ -184,13 +223,13 @@ export class CdkMenuItemTrigger implements OnDestroy {
         break;
 
       case LEFT_ARROW:
-        if (this._isParentVertical()) {
+        if (this._parentMenu && this._isParentVertical()) {
           event.preventDefault();
           if (this._directionality?.value === 'rtl') {
             this.openMenu();
             this.menuPanel?._menu?.focusFirstItem('keyboard');
           } else {
-            this._getMenuStack()?.close(this._parentMenu, FocusNext.currentItem);
+            this._getMenuStack().close(this._parentMenu, FocusNext.currentItem);
           }
         }
         break;
@@ -210,16 +249,18 @@ export class CdkMenuItemTrigger implements OnDestroy {
 
   /** Close out any sibling menu trigger menus. */
   private _closeSiblingTriggers() {
-    const menuStack = this._getMenuStack();
+    if (this._parentMenu) {
+      const menuStack = this._getMenuStack();
 
-    // If nothing was removed from the stack and the last element is not the parent item
-    // that means that the parent menu is a menu bar since we don't put the menu bar on the
-    // stack
-    const isParentMenuBar =
-      !menuStack?.closeSubMenuOf(this._parentMenu) && menuStack?.peek() !== this._parentMenu;
+      // If nothing was removed from the stack and the last element is not the parent item
+      // that means that the parent menu is a menu bar since we don't put the menu bar on the
+      // stack
+      const isParentMenuBar =
+        !menuStack.closeSubMenuOf(this._parentMenu) && menuStack.peek() !== this._parentMenu;
 
-    if (isParentMenuBar) {
-      menuStack?.closeAll();
+      if (isParentMenuBar) {
+        menuStack.closeAll();
+      }
     }
   }
 
@@ -243,7 +284,7 @@ export class CdkMenuItemTrigger implements OnDestroy {
   /** Determine and return where to position the opened menu relative to the menu item */
   private _getOverlayPositions(): ConnectedPosition[] {
     // TODO: use a common positioning config from (possibly) cdk/overlay
-    return this._parentMenu.orientation === 'horizontal'
+    return !this._parentMenu || this._parentMenu.orientation === 'horizontal'
       ? [
           {originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top'},
           {originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom'},
@@ -275,20 +316,37 @@ export class CdkMenuItemTrigger implements OnDestroy {
    * @return true if if the enclosing parent menu is configured in a vertical orientation.
    */
   private _isParentVertical() {
-    return this._parentMenu.orientation === 'vertical';
+    return this._parentMenu?.orientation === 'vertical';
   }
 
-  /** Get the menu stack from the parent. */
+  /**
+   * Subscribe to the MenuStack close events if this is a standalone trigger and close out the menu
+   * this triggers when requested.
+   */
+  private _registerCloseHandler() {
+    if (!this._parentMenu) {
+      this._menuStack.closed.pipe(takeUntil(this._destroyed)).subscribe(item => {
+        if (item === this._menuPanel?._menu) {
+          this.closeMenu();
+        }
+      });
+    }
+  }
+
+  /** Get the menu stack for this trigger - either from the parent or this trigger. */
   private _getMenuStack() {
     // We use a function since at the construction of the MenuItemTrigger the parent Menu won't have
     // its menu stack set. Therefore we need to reference the menu stack from the parent each time
     // we want to use it.
-    return this._parentMenu._menuStack;
+    return this._parentMenu?._menuStack || this._menuStack;
   }
 
   ngOnDestroy() {
     this._destroyOverlay();
     this._resetPanelMenuStack();
+
+    this._destroyed.next();
+    this._destroyed.complete();
   }
 
   /** Set the menu panels menu stack back to null. */

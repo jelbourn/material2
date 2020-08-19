@@ -16,6 +16,7 @@ import {
   Optional,
   NgZone,
   HostListener,
+  InjectionToken,
 } from '@angular/core';
 import {Directionality} from '@angular/cdk/bidi';
 import {FocusKeyManager, FocusOrigin} from '@angular/cdk/a11y';
@@ -27,18 +28,27 @@ import {CDK_MENU, Menu} from './menu-interface';
 import {CdkMenuItem} from './menu-item';
 import {MenuStack, MenuStackItem, FocusNext} from './menu-stack';
 import {getItemPointerEntries} from './item-pointer-entries';
+import {CLOSE_DECIDER, CloseDecider} from './background-click-service';
 
-/**
- * Whether the element is a menu bar or a popup menu.
- * @param target the element to check.
- * @return true if the given element is part of the menu module.
- */
-function isMenuElement(target: Element) {
-  return (
-    target.classList.contains('cdk-menu-bar') ||
-    (target.classList.contains('cdk-menu') && !target.classList.contains('cdk-menu-inline'))
-  );
+/** Whether the menu stack should be closed when target is clicked.  */
+export function shouldCloseMenu(target: Element | null) {
+  while (target) {
+    if (
+      target.classList.contains('cdk-menu-bar') ||
+      (target.classList.contains('cdk-menu') && !target.classList.contains('cdk-menu-inline'))
+    ) {
+      return false;
+    }
+    target = target.parentElement;
+  }
+  return true;
 }
+
+/** Provider for the background click decider function for the MenuBar. */
+export const MENUBAR_CLOSE_PROVIDER: {
+  provide: InjectionToken<CloseDecider>;
+  useValue: (target: Element | null) => boolean;
+} = {provide: CLOSE_DECIDER, useValue: shouldCloseMenu};
 
 /**
  * Directive applied to an element which configures it as a MenuBar by setting the appropriate
@@ -59,6 +69,7 @@ function isMenuElement(target: Element) {
     {provide: CdkMenuGroup, useExisting: CdkMenuBar},
     {provide: CDK_MENU, useExisting: CdkMenuBar},
     {provide: MenuStack, useClass: MenuStack},
+    MENUBAR_CLOSE_PROVIDER,
   ],
 })
 export class CdkMenuBar extends CdkMenuGroup implements Menu, AfterContentInit, OnDestroy {
@@ -257,27 +268,6 @@ export class CdkMenuBar extends CdkMenuGroup implements Menu, AfterContentInit, 
    */
   private _isHorizontal() {
     return this.orientation === 'horizontal';
-  }
-
-  // In Ivy the `host` metadata will be merged, whereas in ViewEngine it is overridden. In order
-  // to avoid double event listeners, we need to use `HostListener`. Once Ivy is the default, we
-  // can move this back into `host`.
-  // tslint:disable:no-host-decorator-in-concrete
-  @HostListener('document:mousedown', ['$event'])
-  /** Close any open submenu if there was a click event which occurred outside the menu stack. */
-  _closeOnBackgroundClick(event: MouseEvent) {
-    if (this._hasOpenSubmenu()) {
-      // get target from composed path to account for shadow dom
-      let target = event.composedPath ? event.composedPath()[0] : event.target;
-      while (target instanceof Element) {
-        if (isMenuElement(target)) {
-          return;
-        }
-        target = target.parentElement;
-      }
-
-      this._menuStack.closeAll();
-    }
   }
 
   /**

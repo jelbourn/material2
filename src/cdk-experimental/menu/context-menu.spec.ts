@@ -56,7 +56,7 @@ describe('CdkContextMenuTrigger', () => {
     it('should close out the context menu when clicking in the context', () => {
       openContextMenu();
 
-      getMenuContext().click();
+      dispatchMouseEvent(getMenuContext(), 'mousedown');
       fixture.detectChanges();
 
       expect(getContextMenu()).not.toBeDefined();
@@ -65,7 +65,7 @@ describe('CdkContextMenuTrigger', () => {
     it('should close out the context menu when clicking on element outside of the context', () => {
       openContextMenu();
 
-      fixture.nativeElement.querySelector('#other').click();
+      dispatchMouseEvent(fixture.nativeElement.querySelector('#other'), 'mousedown');
       fixture.detectChanges();
 
       expect(getContextMenu()).not.toBeDefined();
@@ -202,7 +202,7 @@ describe('CdkContextMenuTrigger', () => {
     it('should close nested context menu when clicking in parent', () => {
       openCopyContextMenu();
 
-      getCutMenuContext().click();
+      dispatchMouseEvent(getCutMenuContext(), 'mousedown');
       fixture.detectChanges();
 
       expect(getCopyMenu()).not.toBeDefined();
@@ -211,7 +211,7 @@ describe('CdkContextMenuTrigger', () => {
     it('should close parent context menu when clicking in nested menu', () => {
       openCutContextMenu();
 
-      getCopyMenuContext().click();
+      dispatchMouseEvent(getCopyMenuContext(), 'mousedown');
       fixture.detectChanges();
 
       expect(getCutMenu()).not.toBeDefined();

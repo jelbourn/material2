@@ -26,6 +26,7 @@ import {CdkMenuItem} from '@angular/cdk-experimental/menu';
     'type': 'button',
     'role': 'menuitem',
     'class': 'cdk-menu-item mat-menubar-item',
+    '[class.cdk-standalone-menu-item]': '_isStandaloneItem()',
     '[attr.aria-disabled]': 'disabled || null',
   },
   providers: [{provide: CdkMenuItem, useExisting: MatMenuBarItem}],
