@@ -28,27 +28,7 @@ import {CDK_MENU, Menu} from './menu-interface';
 import {CdkMenuItem} from './menu-item';
 import {MenuStack, MenuStackItem, FocusNext} from './menu-stack';
 import {getItemPointerEntries} from './item-pointer-entries';
-import {CLOSE_DECIDER, CloseDecider} from './background-click-service';
 
-/** Whether the menu stack should be closed when target is clicked.  */
-export function shouldCloseMenu(target: Element | null) {
-  while (target) {
-    if (
-      target.classList.contains('cdk-menu-bar') ||
-      (target.classList.contains('cdk-menu') && !target.classList.contains('cdk-menu-inline'))
-    ) {
-      return false;
-    }
-    target = target.parentElement;
-  }
-  return true;
-}
-
-/** Provider for the background click decider function for the MenuBar. */
-export const MENUBAR_CLOSE_PROVIDER: {
-  provide: InjectionToken<CloseDecider>;
-  useValue: (target: Element | null) => boolean;
-} = {provide: CLOSE_DECIDER, useValue: shouldCloseMenu};
 
 /**
  * Directive applied to an element which configures it as a MenuBar by setting the appropriate
@@ -69,7 +49,6 @@ export const MENUBAR_CLOSE_PROVIDER: {
     {provide: CdkMenuGroup, useExisting: CdkMenuBar},
     {provide: CDK_MENU, useExisting: CdkMenuBar},
     {provide: MenuStack, useClass: MenuStack},
-    MENUBAR_CLOSE_PROVIDER,
   ],
 })
 export class CdkMenuBar extends CdkMenuGroup implements Menu, AfterContentInit, OnDestroy {

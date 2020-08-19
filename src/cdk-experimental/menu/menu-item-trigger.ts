@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import {isClickInsideMenuOverlay} from '@angular/cdk-experimental/menu/menu';
 import {
   Directive,
   Input,
@@ -34,21 +35,7 @@ import {CdkMenuPanel} from './menu-panel';
 import {Menu, CDK_MENU} from './menu-interface';
 import {throwExistingMenuStackError} from './menu-errors';
 import {FocusNext, MenuStack} from './menu-stack';
-import {BackgroundClickService, CloseDecider, CLOSE_DECIDER} from './background-click-service';
 
-/** Whether the standalone menu should be closed. */
-function shouldCloseMenu(target: Element | null) {
-  while (target) {
-    if (
-      (target.classList.contains('cdk-menu') && !target.classList.contains('cdk-menu-inline')) ||
-      target.classList.contains('cdk-standalone-menu-item')
-    ) {
-      return false;
-    }
-    target = target.parentElement;
-  }
-  return true;
-}
 
 /**
  * A directive to be combined with CdkMenuItem which opens the Menu it is bound to. If the
@@ -64,7 +51,7 @@ function shouldCloseMenu(target: Element | null) {
   exportAs: 'cdkMenuTriggerFor',
   host: {
     '(keydown)': '_toggleOnKeydown($event)',
-    '(mouseenter)': '_toggleOnMouseEnter()',
+    //'(mouseenter)': '_toggleOnMouseEnter()',
     '(click)': 'toggle()',
     'aria-haspopup': 'menu',
     '[attr.aria-expanded]': 'isMenuOpen()',
@@ -116,22 +103,9 @@ export class CdkMenuItemTrigger implements OnDestroy {
     private readonly _elementRef: ElementRef<HTMLElement>,
     protected readonly _viewContainerRef: ViewContainerRef,
     private readonly _overlay: Overlay,
-    private readonly _closeService: BackgroundClickService,
-    @Optional()
-    @Inject(CLOSE_DECIDER)
-    private readonly _closeHandler?: CloseDecider,
     @Optional() @Inject(CDK_MENU) private readonly _parentMenu?: Menu,
     @Optional() private readonly _directionality?: Directionality
-  ) {
-    this._registerCloseHandler();
-
-    // If there is no parent menu, this is a standalone trigger so we use the standalone trigger
-    // close handler. If the parent is defined, the trigger should (optionally) inject the close
-    // handler (sub-menus shouldn't inject).
-    if (!_parentMenu) {
-      this._closeHandler = shouldCloseMenu;
-    }
-  }
+  ) {}
 
   /** Open/close the attached menu if the trigger has been configured with one */
   toggle() {
@@ -147,10 +121,12 @@ export class CdkMenuItemTrigger implements OnDestroy {
 
       this._overlayRef = this._overlayRef || this._overlay.create(this._getOverlayConfig());
       this._overlayRef.attach(this._getPortal());
-
-      if (this._closeHandler) {
-        this._closeService.startListener(this._closeHandler, this._getMenuStack());
-      }
+      this._overlayRef.outsidePointerEvents().subscribe(event => {
+        if (!isClickInsideMenuOverlay(event.target as Element)) {
+          this._overlayRef?.dispose();
+          this._overlayRef = null;
+        }
+      });
     }
   }
 

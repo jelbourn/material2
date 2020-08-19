@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
+import {isClickInsideMenuOverlay} from '@angular/cdk-experimental/menu/menu';
 import {
   Directive,
   Input,
@@ -34,7 +35,6 @@ import {takeUntil} from 'rxjs/operators';
 import {CdkMenuPanel} from './menu-panel';
 import {MenuStack, MenuStackItem} from './menu-stack';
 import {throwExistingMenuStackError} from './menu-errors';
-import {BackgroundClickService} from './background-click-service';
 
 /**
  * Whether the context menu should close when some element is clicked.
@@ -157,7 +157,6 @@ export class CdkContextMenuTrigger implements OnDestroy {
     private readonly _overlay: Overlay,
     private readonly _contextMenuTracker: ContextMenuTracker,
     @Inject(CDK_CONTEXT_MENU_DEFAULT_OPTIONS) private readonly _options: ContextMenuOptions,
-    private readonly _closeService: BackgroundClickService,
     @Optional() private readonly _directionality?: Directionality
   ) {
     this._setMenuStackListener();
@@ -190,8 +189,12 @@ export class CdkContextMenuTrigger implements OnDestroy {
       }
 
       this._overlayRef.attach(this._getMenuContent());
-
-      this._closeService.startListener(shouldCloseMenu, this._menuStack);
+      this._overlayRef.outsidePointerEvents().subscribe(event => {
+        if (!isClickInsideMenuOverlay(event.target as Element)) {
+          this._overlayRef?.dispose();
+          this._overlayRef = null;
+        }
+      });
     }
   }
 

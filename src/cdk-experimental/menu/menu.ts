@@ -347,3 +347,15 @@ export class CdkMenu extends CdkMenuGroup implements Menu, AfterContentInit, OnI
     this.closed.complete();
   }
 }
+
+export function isClickInsideMenuOverlay(target: Element): boolean {
+  while (target?.parentElement) {
+    if (target.classList.contains('cdk-menu')) {
+      return !!target?.parentElement?.classList?.contains('cdk-overlay-panel');
+    }
+
+    target = target.parentElement;
+  }
+
+  return false;
+}

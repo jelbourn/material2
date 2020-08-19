@@ -12,7 +12,6 @@ import {
   CdkMenuGroup,
   CDK_MENU,
   MenuStack,
-  MENUBAR_CLOSE_PROVIDER,
 } from '@angular/cdk-experimental/menu';
 
 /**
@@ -37,7 +36,6 @@ import {
     {provide: CdkMenuBar, useExisting: MatMenuBar},
     {provide: CDK_MENU, useExisting: MatMenuBar},
     {provide: MenuStack, useClass: MenuStack},
-    MENUBAR_CLOSE_PROVIDER,
   ],
 })
 export class MatMenuBar extends CdkMenuBar {}
