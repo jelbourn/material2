@@ -62,6 +62,13 @@ export class MatSelectTrigger {}
     'class': 'mat-mdc-select',
     '[attr.id]': 'id',
     '[attr.tabindex]': 'tabIndex',
+    // While aria-owns is not required for the `role="combobox"` interaction pattern,
+    // it fixes an issue with VoiceOver when the select appears inside of an `aria-model="true"`
+    // element (e.g. a dialog). Without `aria-owns`, the `aria-modal` on a dialog would prevent
+    // VoiceOver from "seeing" the select's listbox overlay for aria-activedescendant.
+    // Using `aria-owns` re-parents the select overlay so that it works again.
+    // See https://github.com/angular/components/issues/20694
+    '[attr.aria-owns]': 'panelOpen ? id + "-panel" : null',
     '[attr.aria-controls]': 'panelOpen ? id + "-panel" : null',
     '[attr.aria-expanded]': 'panelOpen',
     '[attr.aria-label]': 'ariaLabel || null',

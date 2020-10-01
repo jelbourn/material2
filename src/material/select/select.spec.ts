@@ -165,6 +165,18 @@ describe('MatSelect', () => {
           expect(ariaControls).toBe(document.querySelector('.mat-select-panel')!.id);
         }));
 
+        it('should point the aria-controls attribute to the listbox', fakeAsync(() => {
+          expect(select.hasAttribute('aria-owns')).toBe(false);
+
+          fixture.componentInstance.select.open();
+          fixture.detectChanges();
+          flush();
+
+          const ariaControls = select.getAttribute('aria-owns');
+          expect(ariaControls).toBeTruthy();
+          expect(ariaControls).toBe(document.querySelector('.mat-select-panel')!.id);
+        }));
+
         it('should set aria-expanded based on the select open state', fakeAsync(() => {
           expect(select.getAttribute('aria-expanded')).toBe('false');
 
