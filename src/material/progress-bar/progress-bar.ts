@@ -26,8 +26,8 @@ import {
 } from '@angular/core';
 import {CanColor, CanColorCtor, mixinColor} from '@angular/material/core';
 import {ANIMATION_MODULE_TYPE} from '@angular/platform-browser/animations';
-import {fromEvent, Observable, Subscription} from 'rxjs';
-import {filter} from 'rxjs/operators';
+import {fromEvent, Observable, Subject, Subscription} from 'rxjs';
+import {filter, startWith} from 'rxjs/operators';
 
 
 // TODO(josephperrott): Benchpress tests.
@@ -105,7 +105,23 @@ let progressbarId = 0;
 })
 export class MatProgressBar extends _MatProgressBarMixinBase implements CanColor,
                                                       AfterViewInit, OnDestroy {
-  constructor(public _elementRef: ElementRef, private _ngZone: NgZone,
+
+  ariaAttributeChanges = new Subject<string>();
+  ariaObserver = new MutationObserver((mutationRecords: MutationRecord[]) => {
+    for (const record of mutationRecords) {
+      if (record.attributeName === 'aria-label') {
+        const target = record.target as HTMLElement;
+        const ariaLabel = target.getAttribute('aria-label');
+        if (!ariaLabel) return;
+
+        this.ariaAttributeChanges.next(ariaLabel);
+        target.removeAttribute('aria-label');
+        return;
+      }
+    }
+  });
+
+  constructor(public _elementRef: ElementRef<HTMLElement>, private _ngZone: NgZone,
               @Optional() @Inject(ANIMATION_MODULE_TYPE) public _animationMode?: string,
               /**
                * @deprecated `location` parameter to be made required.
@@ -124,6 +140,11 @@ export class MatProgressBar extends _MatProgressBarMixinBase implements CanColor
     const path = location ? location.getPathname().split('#')[0] : '';
     this._rectangleFillValue = `url('${path}#${this.progressbarId}')`;
     this._isNoopAnimation = _animationMode === 'NoopAnimations';
+
+    const initialLabel = _elementRef.nativeElement.getAttribute('aria-label');
+    this.ariaAttributeChanges.pipe(startWith(initialLabel)).subscribe(ariaLabel => {
+      this._updateProgressLabel();
+    });
   }
 
   /** Flag that indicates whether NoopAnimations mode is set to true. */
@@ -169,6 +190,10 @@ export class MatProgressBar extends _MatProgressBarMixinBase implements CanColor
 
   /** Attribute to be used for the `fill` attribute on the internal `rect` element. */
   _rectangleFillValue: string;
+
+  private _updateProgressLabel() {
+    // write label to dom
+  }
 
   /** Gets the current transform value for the progress bar's primary indicator. */
   _primaryTransform() {
