@@ -7,7 +7,12 @@
  */
 
 import {FocusableOption} from '@angular/cdk/a11y';
-import {BooleanInput, coerceBooleanProperty, NumberInput} from '@angular/cdk/coercion';
+import {
+  BooleanInput,
+  coerceBooleanProperty,
+  coerceNumberProperty,
+  NumberInput
+} from '@angular/cdk/coercion';
 import {BACKSPACE, DELETE, SPACE} from '@angular/cdk/keycodes';
 import {Platform} from '@angular/cdk/platform';
 import {DOCUMENT} from '@angular/common';
@@ -33,11 +38,9 @@ import {
   CanDisableRipple,
   CanDisableRippleCtor,
   HasTabIndex,
-  HasTabIndexCtor,
   MAT_RIPPLE_GLOBAL_OPTIONS,
   mixinColor,
   mixinDisableRipple,
-  mixinTabIndex,
   RippleConfig,
   RippleGlobalOptions,
   RippleRenderer,
@@ -93,9 +96,8 @@ class MatChipBase {
   constructor(public _elementRef: ElementRef) {}
 }
 
-const _MatChipMixinBase: CanColorCtor & CanDisableRippleCtor &
-    HasTabIndexCtor & typeof MatChipBase =
-      mixinTabIndex(mixinColor(mixinDisableRipple(MatChipBase), 'primary'), -1);
+const _MatChipMixinBase: CanColorCtor & CanDisableRippleCtor & typeof MatChipBase =
+      mixinColor(mixinDisableRipple(MatChipBase), 'primary');
 
 /**
  * Dummy directive to add CSS class to chip avatar.
@@ -146,7 +148,7 @@ export class MatChipTrailingIcon {}
   },
 })
 export class MatChip extends _MatChipMixinBase implements FocusableOption, OnDestroy, CanColor,
-  CanDisableRipple, RippleTarget, HasTabIndex, CanDisable {
+  CanDisableRipple, RippleTarget, CanDisable {
 
   /** Reference to the RippleRenderer for the chip. */
   private _chipRipple: RippleRenderer;
@@ -242,6 +244,13 @@ export class MatChip extends _MatChipMixinBase implements FocusableOption, OnDes
     this._disabled = coerceBooleanProperty(value);
   }
   protected _disabled: boolean = false;
+
+  @Input()
+  get tabIndex(): number { return this._tabIndex; }
+  set tabIndex(value: number) {
+    this._tabIndex = coerceNumberProperty(value ?? -1);
+  }
+  private _tabIndex: number = -1;
 
   /**
    * Determines whether or not the chip displays the remove styling and emits (removed) events.

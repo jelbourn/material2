@@ -7,14 +7,19 @@
  */
 
 import {Directionality} from '@angular/cdk/bidi';
-import {BooleanInput, coerceBooleanProperty, NumberInput} from '@angular/cdk/coercion';
-import {ANIMATION_MODULE_TYPE} from '@angular/platform-browser/animations';
+import {
+  BooleanInput,
+  coerceBooleanProperty,
+  coerceNumberProperty,
+  NumberInput
+} from '@angular/cdk/coercion';
+import {ENTER, hasModifierKey, SPACE} from '@angular/cdk/keycodes';
 import {
   AfterContentInit,
   AfterViewInit,
-  Component,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
+  Component,
   ContentChild,
   Directive,
   ElementRef,
@@ -26,8 +31,8 @@ import {
   OnDestroy,
   Optional,
   Output,
-  ViewEncapsulation,
   ViewChild,
+  ViewEncapsulation,
 } from '@angular/core';
 import {
   CanColor,
@@ -36,26 +41,25 @@ import {
   CanDisableRipple,
   CanDisableRippleCtor,
   HasTabIndex,
-  HasTabIndexCtor,
-  MatRipple,
   MAT_RIPPLE_GLOBAL_OPTIONS,
+  MatRipple,
   mixinColor,
   mixinDisableRipple,
-  mixinTabIndex,
   RippleAnimationConfig,
   RippleGlobalOptions,
 } from '@angular/material-experimental/mdc-core';
+import {ANIMATION_MODULE_TYPE} from '@angular/platform-browser/animations';
 import {deprecated} from '@material/chips';
 import {numbers} from '@material/ripple';
-import {SPACE, ENTER, hasModifierKey} from '@angular/cdk/keycodes';
 import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
 import {
-  MatChipAvatar,
-  MatChipTrailingIcon,
-  MatChipRemove,
   MAT_CHIP_AVATAR,
-  MAT_CHIP_TRAILING_ICON, MAT_CHIP_REMOVE
+  MAT_CHIP_REMOVE,
+  MAT_CHIP_TRAILING_ICON,
+  MatChipAvatar,
+  MatChipRemove,
+  MatChipTrailingIcon
 } from './chip-icons';
 
 
@@ -95,9 +99,8 @@ class MatChipBase {
 const _MatChipMixinBase:
   CanColorCtor &
   CanDisableRippleCtor &
-  HasTabIndexCtor &
   typeof MatChipBase =
-    mixinTabIndex(mixinColor(mixinDisableRipple(MatChipBase), 'primary'), -1);
+    mixinColor(mixinDisableRipple(MatChipBase), 'primary'));
 
 /**
  * Material design styled Chip base component. Used inside the MatChipSet component.
@@ -126,7 +129,7 @@ const _MatChipMixinBase:
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MatChip extends _MatChipMixinBase implements AfterContentInit, AfterViewInit,
-  CanColor, CanDisableRipple, CanDisable, HasTabIndex, OnDestroy {
+  CanColor, CanDisableRipple, CanDisable, OnDestroy {
   /** The ripple animation configuration to use for the chip. */
   readonly _rippleAnimation: RippleAnimationConfig = RIPPLE_ANIMATION_CONFIG;
 
@@ -180,6 +183,13 @@ export class MatChip extends _MatChipMixinBase implements AfterContentInit, Afte
     }
   }
   protected _disabled: boolean = false;
+
+  @Input()
+  get tabIndex(): number { return this._tabIndex; }
+  set tabIndex(value: number) {
+    this._tabIndex = coerceNumberProperty(value ?? -1);
+  }
+  private _tabIndex: number = -1;
 
   private _textElement!: HTMLElement;
 
