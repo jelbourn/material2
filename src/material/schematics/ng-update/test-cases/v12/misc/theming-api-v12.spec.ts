@@ -754,4 +754,53 @@ describe('v12 theming API migration', () => {
       `$another: mat.$pink-palette;`,
     ]);
   });
+
+  it('should insert @use before other code when only Angular imports are first', async () => {
+    writeLines(THEME_PATH, [
+      `@import '~@angular/material/theming';`,
+      `$something: 123;`,
+      `@include mat-core();`,
+      `@import 'some/other/file';`,
+    ]);
+
+    await runMigration();
+
+    expect(splitFile(THEME_PATH)).toEqual([
+      `@use '~@angular/material' as mat;`,
+      `$something: 123;`,
+      `@import 'some/other/file';`,
+    ]);
+  });
+
+  it('should not rename variables appended with extra characters', async () => {
+    writeLines(THEME_PATH, [
+      `@import '~@angular/material/theming';`,
+      `$mat-light-theme-background-override: 123;`,
+      `@include mat.core();`,
+    ]);
+
+    await runMigration();
+
+    expect(splitFile(THEME_PATH)).toEqual([
+      `@use '~@angular/material' as mat;`,
+      `$mat-light-theme-background-override: 123;`,
+      `@include mat.core();`,
+    ]);
+  });
+
+  it('should not rename functions prepended with extra characters', async () => {
+    writeLines(THEME_PATH, [
+      `@function gmat-palette() {`,
+      `  @return white;`,
+      `}`,
+    ]);
+
+    await runMigration();
+
+    expect(splitFile(THEME_PATH)).toEqual([
+      `@function gmat-palette() {`,
+      `  @return white;`,
+      `}`,
+    ]);
+  });
 });
